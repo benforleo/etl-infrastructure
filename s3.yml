@@ -13,10 +13,7 @@ Resources:
                   - 's3:Put*'
                   - 's3:DeleteObject*'
                   - 's3:RestoreObject'
-                  - 's3:CreateMultiPartUpload'
-                  - 's3:CompleteMultipartUpload'
-                  - 's3:AbortMultipartUpload'
-                Resource: !Join ['', ['arn:aws:s3:::', 'staging-', !Ref 'AWS::AccountId']]
+                Resource: !Join ['', ['arn:aws:s3:::', 'staging-', !Ref 'AWS::AccountId', '/*']]
   StagingBucket:
     Type: 'AWS::S3::Bucket'
     DeletionPolicy: Delete
