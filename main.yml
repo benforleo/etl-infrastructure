@@ -1,0 +1,40 @@
+Parameters:
+  S3NestedStackURL:
+    Type: String
+    MinLength: 1
+
+Resources:
+  S3Stack:
+    Type: AWS::Cloudformation::Stack
+    Properties:
+      TemplateURL: !Sub ${S3NestedStackURL}
+      TimeoutInMinutes: '5'
+
+  IAMUser:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: 'etl-iam-user'
+      Path: /etl-infrastructure/
+
+  IAMUserPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      Users:
+        - !Ref IAMUser
+      PolicyName: 'etl-storage-policy'
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - 's3:Get*'
+              - 's3:Put*'
+              - 's3:DeleteObject*'
+              - 's3:RestoreObject'
+              - 's3:List*'
+              - 's3:Describe*'
+              - 's3:Head*'
+              - 's3:Upload*'
+            Resource:
+              - !Join ["", [ !GetAtt [ S3Stack, Outputs.StagingBucketOutput ], "*"]]
+              - !Join ["", [ !GetAtt [S3Stack, Outputs.CuratedBucketOutput ], "*"]]
